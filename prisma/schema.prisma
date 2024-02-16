@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Info {
+  id           String   @default(uuid()) @db.Uuid
+  fromCurrency String   @map("from_currency")
+  toCurrency   String   @map("to_currency")
+  buy          Decimal  @db.Decimal(25, 15)
+  sell         Decimal  @db.Decimal(25, 15)
+  timestamp    DateTime
+
+  @@id([id, fromCurrency])
+}
