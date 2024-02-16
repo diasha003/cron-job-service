@@ -1,10 +1,10 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
-import { TickerApiResponse } from './dto/tickerApiResponse.dto';
-import { Cron } from '@nestjs/schedule';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { Info } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+
+import { PrismaService } from 'src/prisma/prisma.service';
+import { InfoDto } from './dto/info.dto';
+import { HistoryDto, HistoryItemDto } from './dto/history.dto';
 
 @Injectable()
 export class TickersService {
@@ -13,36 +13,19 @@ export class TickersService {
     private readonly prisma: PrismaService,
   ) {}
 
-  @Cron('0 * * * * *')
-  async getAll() {
-    const { data } = await firstValueFrom(
-      this.httpService.get<TickerApiResponse>(
-        'https://api.kucoin.com/api/v1/market/allTickers',
-      ),
-    );
-
-    const tickersData = data.data.ticker.map((item) => ({
-      fromCurrency: item.symbol.split('-')[0],
-      toCurrency: item.symbol.split('-')[1],
-      buy: Number(item.buy),
-      sell: Number(item.sell),
-      timestamp: new Date(data.data.time),
-    }));
-
-    // await this.prisma.info.createMany({
-    //   data: tickersData,
-    // });
-
-    console.log('insert');
-
-    return tickersData;
-  }
-
-  async getTickersLatestPrices(): Promise<Info[]> {
+  async getTickersLatestPrices(): Promise<InfoDto[]> {
     const allTickers = await this.prisma.info.findMany({
       distinct: ['fromCurrency', 'toCurrency'],
       orderBy: {
         timestamp: 'desc',
+      },
+      select: {
+        id: false,
+        buy: true,
+        fromCurrency: true,
+        sell: true,
+        timestamp: true,
+        toCurrency: true,
       },
     });
 
@@ -51,19 +34,42 @@ export class TickersService {
 
   async getHistoryPriceTicker(
     fromCurrency: string,
+    toCurrency: string,
     fromDate?: string,
     toDate?: string,
-  ): Promise<Info[]> {
+  ): Promise<HistoryDto> {
     const info = await this.prisma.info.findMany({
       where: {
         fromCurrency,
+        toCurrency,
         timestamp: {
           gte: fromDate ? new Date(fromDate) : undefined,
           lte: toDate ? new Date(toDate) : undefined,
         },
       },
+      orderBy: {
+        timestamp: 'asc',
+      },
+      select: {
+        id: false,
+        buy: true,
+        fromCurrency: true,
+        sell: true,
+        timestamp: true,
+        toCurrency: true,
+      },
     });
 
-    return info;
+    const historyItems: HistoryItemDto[] = info.map((x) => ({
+      buy: x.buy.toNumber(),
+      sell: x.sell.toNumber(),
+      timestamp: x.timestamp,
+    }));
+
+    return {
+      fromCurrency,
+      toCurrency,
+      history: historyItems,
+    };
   }
 }
