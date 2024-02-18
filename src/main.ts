@@ -19,9 +19,7 @@ function configureSwaggerUI(app: INestApplication) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   configureSwaggerUI(app);
-
-  await app.listen(3000);
+  await app.listen(process.env.PORT);
 }
 bootstrap();
