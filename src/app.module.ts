@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
     TickersModule,
     PrismaModule,
     ConfigModule.forRoot({
-      envFilePath: `${process.cwd()}\\config\\${process.env.NODE_ENV}.env`,
+      envFilePath: `${process.cwd()}/config/${process.env.NODE_ENV}.env`,
       isGlobal: true,
     }),
   ],
