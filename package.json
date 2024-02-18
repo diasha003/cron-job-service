@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.2",
@@ -48,6 +49,7 @@
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "gh-pages": "^6.1.1",
     "jest": "^29.5.0",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
