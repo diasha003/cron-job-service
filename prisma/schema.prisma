@@ -16,4 +16,7 @@ model Info {
   timestamp    DateTime
 
   @@id([id, fromCurrency])
+  @@index([fromCurrency], type: Hash)
+  @@index([toCurrency], type: Hash)
+  @@index([timestamp], type: Hash)
 }
