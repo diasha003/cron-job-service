@@ -36,10 +36,9 @@ export class TickersJobs {
     await this.prisma.info.createMany({
       data: tickersData,
     });
-    //console.log('inserted');
   }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async cleanupDatabaseJob() {
     const lastAddData = await this.prisma.info.groupBy({
       by: ['timestamp'],
@@ -51,8 +50,12 @@ export class TickersJobs {
           timestamp: 'desc',
         },
       },
-      skip: 2,
+      skip: Number(process.env.MAX_MINUTES),
     });
+
+    if (lastAddData.length === 0) {
+      return;
+    }
 
     const timestampsToDelete = lastAddData.map((data) => data.timestamp);
 
@@ -63,6 +66,5 @@ export class TickersJobs {
         },
       },
     });
-    //console.log('delete');
   }
 }
