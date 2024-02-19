@@ -1,4 +1,9 @@
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { Info } from '@prisma/client';
 
@@ -15,6 +20,9 @@ export class TickersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/latest-prices')
+  @ApiOperation({
+    summary: 'Get data on the latest prices of all cryptocurrency pairs',
+  })
   async getTickersLatestPrices(): Promise<InfoDto[]> {
     return this.tickersService.getTickersLatestPrices();
   }
@@ -30,6 +38,10 @@ export class TickersController {
     name: 'toDate',
     required: false,
     description: 'Date format: YYYY-ММ-DDThh:mmZ',
+  })
+  @ApiOperation({
+    summary:
+      'Get history of price changes of a particular pair of cryptocurrencies for a period',
   })
   getHistoryPriceTicker(
     @Param('fromCurrency') fromCurrency: string,

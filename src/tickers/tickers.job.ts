@@ -6,7 +6,6 @@ import { Injectable } from '@nestjs/common';
 import { ExternalApiConstants } from 'src/constants/external-api-constants';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TickerApiResponse } from './dto/tickerApiResponse.dto';
-import { timeStamp } from 'console';
 
 @Injectable()
 export class TickersJobs {
